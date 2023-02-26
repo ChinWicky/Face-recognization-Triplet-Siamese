@@ -14,7 +14,9 @@ import random
 import torch.nn.functional as F
 from tensorboardX import SummaryWriter
 from sklearn.metrics import accuracy_score
-
+from torchsummary import summary
+from torchviz import make_dot
+import matplotlib.pyplot as plt
 def save_checkpoint(state, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
 
@@ -57,6 +59,7 @@ def train(model, train_loader, criterion, optimizer, epoch):
     # training log
     print('Train Epoch: {} \tLoss: {:.6f}'.format(
         epoch, running_loss / len(train_loader)))
+
     return running_loss / len(train_loader)
 
 
@@ -96,9 +99,9 @@ def test(model, testloader, threshold):
                     fn += 1
             total += 1
     accuracy = correct / total
-    recall = tp / (tp + fn)
+    #recall = tp / (tp + fn)
     print('Accuracy of the network on the test images: {:.2f}%'.format(100 * accuracy))
-    print('Recall: {:.2f}%'.format(recall * 100))
+    #print('Recall: {:.2f}%'.format(recall * 100))
 
     triplet_loss = SiameseTriplet.SiameseTripletLoss(margin=0.2).to(device)
     #loss = triplet_loss(out1, out2, out3)
@@ -134,7 +137,7 @@ if __name__ == '__main__':
         transforms.ToTensor(),
         #transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
     ])
-    epochs = 10
+    epochs = 20
     batch_size = 32
 
     path = './Extracted Faces/Extracted Faces'
@@ -147,15 +150,22 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     siamese_net = SiameseTriplet.SiameseTripletNetwork().to(device)  # model
-    criterion = SiameseTriplet.SiameseTripletLoss(margin=0.2).to(device)
 
-    #criterion = nn.TripletMarginLoss(margin=0.1)
+    x = torch.randn(1, 1, 100, 100).to(device)
+    y = siamese_net(x)
+    graph = make_dot(y, params=dict(siamese_net.named_parameters()))
+    graph.render("my_model")
+    criterion = SiameseTriplet.SiameseTripletLoss(margin=0.2).to(device)
+    #summary(siamese_net, (3, 32, 32))
+
     optimizer = optim.Adam(siamese_net.parameters(), lr=1e-3)
     #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
-    writer = SummaryWriter(logdir='logs')
+    #writer = SummaryWriter(logdir='logs')
+    losses = []
     for epoch in range(1, epochs + 1):
         train_loss = train(siamese_net, train_loader, criterion, optimizer, epoch)
-        writer.add_scalar('Train Loss', train_loss, epoch)
+        losses.append(train_loss)
+        #writer.add_scalar('Train Loss', train_loss, epoch)
 
         # save_checkpoint({
         #     'epoch': epoch + 1,
@@ -165,11 +175,18 @@ if __name__ == '__main__':
         #scheduler.step()
 
     # close
-    writer.close()
+    #writer.close()
+    # loss of training
+    plt.plot(losses)
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Training Loss")
+    plt.show()
 
     test_dataset = SiameseTriplet.OneShotSiameseDataset(path, test_list, transform=transform)
     test_loader = DataLoader(test_dataset, shuffle=True, batch_size=1)
     test(siamese_net,test_loader, 0.2)
+
 
 
 
