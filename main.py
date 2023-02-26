@@ -181,6 +181,7 @@ if __name__ == '__main__':
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Training Loss")
+    plt.savefig("loss of train.png")
     plt.show()
 
     test_dataset = SiameseTriplet.OneShotSiameseDataset(path, test_list, transform=transform)
