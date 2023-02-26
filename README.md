@@ -10,7 +10,9 @@ Labeled Faces in the Wild (LFW) Face Dataset
 # Architecture
 - Siamese neural network with Triplet loss
 - The network model is shown in the figure
-<iframe src="my_model.pdf" style="width:100%; height:600px;" frameborder="0"></iframe>
+<p align="center">
+    <img src="my_model.png" alt="model" style="width:50%" />
+</p> 
 
 # Experiment
 - The final result achieves an accuracy of 92%.
