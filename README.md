@@ -1,2 +1,3 @@
 # Face-recognization-Triplet-Siamese
-pytorch
+
+one-shot type face recogniaztion based on Pytorch.
