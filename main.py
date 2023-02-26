@@ -32,29 +32,29 @@ def split_dataset(directory, split=0.8):
 
     return train_list, val_list, test_list
 
-# 定义训练函数
+# training function
 def train(model, train_loader, criterion, optimizer, epoch):
     model.train()
     running_loss = 0.0
     for batch_idx, data in enumerate(train_loader):
-        # 将数据和标签放到GPU上
+        # to gpu
         anchor, positive, negative, label = data
         anchor, positive, negative = anchor.to(device), positive.to(device), negative.to(device)
 
         output1 = siamese_net(anchor)
         output2 = siamese_net(positive)
         output3 = siamese_net(negative)
-        # 计算triplet loss
+        # triplet loss
         loss = criterion(output1, output2, output3)
 
-        # 反向传播和优化
+        # backpropagation
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
         running_loss += loss.item()
 
-    # 打印训练日志
+    # training log
     print('Train Epoch: {} \tLoss: {:.6f}'.format(
         epoch, running_loss / len(train_loader)))
     return running_loss / len(train_loader)
@@ -164,7 +164,7 @@ if __name__ == '__main__':
         # }, filename=f'checkpoint_epoch{epoch + 1}.pth.tar')
         #scheduler.step()
 
-    # 关闭SummaryWriter对象
+    # close
     writer.close()
 
     test_dataset = SiameseTriplet.OneShotSiameseDataset(path, test_list, transform=transform)
