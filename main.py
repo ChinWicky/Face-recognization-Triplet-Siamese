@@ -154,6 +154,7 @@ if __name__ == '__main__':
     x = torch.randn(1, 1, 100, 100).to(device)
     y = siamese_net(x)
     graph = make_dot(y, params=dict(siamese_net.named_parameters()))
+    graph.format = "png"
     graph.render("my_model")
     criterion = SiameseTriplet.SiameseTripletLoss(margin=0.2).to(device)
     #summary(siamese_net, (3, 32, 32))
