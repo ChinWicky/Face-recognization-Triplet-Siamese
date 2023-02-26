@@ -9,7 +9,7 @@ Labeled Faces in the Wild (LFW) Face Dataset
 
 # Architecture
 - Siamese neural network with Triplet loss
-- The network model is shown in the figure
+- The network model architecture is shown in the figure
 <p align="center">
     <img src="my_model.png" alt="model" style="width:50%" />
 </p> 
